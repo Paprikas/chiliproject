@@ -295,6 +295,14 @@ class MailerTest < ActiveSupport::TestCase
     end
   end
   
+  def test_news_comment_added
+    comment = Comment.find(2)
+    valid_languages.each do |lang|
+      Setting.default_language = lang.to_s
+      assert Mailer.deliver_news_comment_added(comment)
+    end
+  end
+  
   def test_message_posted
     message = Message.find(:first)
     recipients = ([message.root] + message.root.children).collect {|m| m.author.mail if m.author}

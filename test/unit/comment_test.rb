@@ -31,6 +31,15 @@ class CommentTest < ActiveSupport::TestCase
     @news.reload
     assert_equal 2, @news.comments_count
   end
+  
+  def test_create_should_send_notification
+    Setting.notified_events << 'news_comment_added'
+    Watcher.create!(:watchable => @news, :user => @jsmith)
+    
+    assert_difference 'ActionMailer::Base.deliveries.size' do
+      Comment.create!(:commented => @news, :author => @jsmith, :comments => "my comment")
+    end
+  end
 
   def test_validate
     comment = Comment.new(:commented => @news)
