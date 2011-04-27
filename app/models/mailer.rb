@@ -154,6 +154,25 @@ class Mailer < ActionMailer::Base
          :news_url => url_for(:controller => 'news', :action => 'show', :id => news)
     render_multipart('news_added', body)
   end
+  
+  # Builds a tmail object used to email recipients of a news' project when a news comment is added.
+  #
+  # Example:
+  #   news_comment_added(comment) => tmail object
+  #   Mailer.news_comment_added(comment) => sends an email to the news' project recipients
+  def news_comment_added(comment)
+    news = comment.commented
+    redmine_headers 'Project' => news.project.identifier,
+                    'Type' => "News"
+    message_id comment
+    recipients news.recipients
+    cc news.watcher_recipients
+    subject "Re: [#{news.project.name}] #{l(:label_news)}: #{news.title}"
+    body :news => news,
+         :comment => comment,
+         :news_url => url_for(:controller => 'news', :action => 'show', :id => news)
+    render_multipart('news_comment_added', body)
+  end
 
   # Builds a tmail object used to email the recipients of the specified message that was posted. 
   #
