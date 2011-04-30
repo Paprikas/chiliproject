@@ -148,7 +148,7 @@ class Mailer < ActionMailer::Base
     redmine_headers 'Project' => news.project.identifier,
                     'Type' => "News"
     message_id news
-    recipients news.recipients
+    recipients news.project.members.collect {|m| m.user}.collect {|u| u.mail}
     subject "[#{news.project.name}] #{l(:label_news)}: #{news.title}"
     body :news => news,
          :news_url => url_for(:controller => 'news', :action => 'show', :id => news)
@@ -165,7 +165,7 @@ class Mailer < ActionMailer::Base
     redmine_headers 'Project' => news.project.identifier,
                     'Type' => "News"
     message_id comment
-    recipients news.recipients
+    recipients news.project.members.collect {|m| m.user}.collect {|u| u.mail}
     cc news.watcher_recipients
     subject "Re: [#{news.project.name}] #{l(:label_news)}: #{news.title}"
     body :news => news,
